@@ -2,11 +2,11 @@
 
 >>> text_indentation("Hello. How are you? Good: yes")
 Hello.
-
+<BLANKLINE>
 How are you?
-
+<BLANKLINE>
 Good:
-
+<BLANKLINE>
 yes
 
 >>> text_indentation("No punctuation here")
@@ -14,12 +14,14 @@ No punctuation here
 
 >>> text_indentation("Hello.")
 Hello.
+<BLANKLINE>
 
 >>> text_indentation("")
->>> text_indentation("   Hello.   World?   ")
+>>> text_indentation(" Hello. World? ")
 Hello.
-
+<BLANKLINE>
 World?
+<BLANKLINE>
 
 >>> text_indentation(123)
 Traceback (most recent call last):
