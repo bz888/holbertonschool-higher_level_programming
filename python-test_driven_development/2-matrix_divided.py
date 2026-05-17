@@ -1,7 +1,22 @@
 #!/usr/bin/python3
+"""Module that provides matrix division."""
 
 
 def matrix_divided(matrix, div):
+    """Return a new matrix with every element divided by div.
+
+    Args:
+        matrix: A list of lists containing integers or floats.
+        div: The integer or float divisor.
+
+    Raises:
+        TypeError: If matrix is not a valid matrix of integers/floats,
+            if rows are not the same size, or if div is not a number.
+        ZeroDivisionError: If div is zero.
+
+    Returns:
+        A new matrix with each result rounded to 2 decimal places.
+    """
     if (
         not isinstance(matrix, list) or
         matrix == [] or
