@@ -12,7 +12,7 @@ class Student:
         self.age = age
 
     def to_json(self, attrs=None):
-        """Return a dictionary representation of the Student"""
+        """Return a dictionary representation of the Student."""
         if type(attrs) is list and all(type(attr) is str for attr in attrs):
             return {
                 attr: getattr(self, attr)
@@ -21,3 +21,8 @@ class Student:
             }
 
         return self.__dict__
+
+    def reload_from_json(self, json):
+        """Replace all attributes of the Student."""
+        for key, value in json.items():
+            setattr(self, key, value)
