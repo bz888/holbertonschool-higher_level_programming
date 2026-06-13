@@ -22,14 +22,41 @@ jwt = JWTManager(app)
 
 users = {
     "user1": {
+        "username": "user1",
         "password": generate_password_hash("password"),
         "role": "user",
     },
     "admin1": {
-        "password": generate_password_hash("adminpass"),
+        "username": "admin1",
+        "password": generate_password_hash("password"),
         "role": "admin",
     },
 }
+
+
+@jwt.unauthorized_loader
+def handle_unauthorized_error(error):
+    return jsonify({"error": "Missing or invalid token"}), 401
+
+
+@jwt.invalid_token_loader
+def handle_invalid_token_error(error):
+    return jsonify({"error": "Invalid token"}), 401
+
+
+@jwt.expired_token_loader
+def handle_expired_token_error(jwt_header, jwt_payload):
+    return jsonify({"error": "Token has expired"}), 401
+
+
+@jwt.revoked_token_loader
+def handle_revoked_token_error(jwt_header, jwt_payload):
+    return jsonify({"error": "Token has been revoked"}), 401
+
+
+@jwt.needs_fresh_token_loader
+def handle_needs_fresh_token_error(jwt_header, jwt_payload):
+    return jsonify({"error": "Fresh token required"}), 401
 
 
 @auth.verify_password
@@ -50,7 +77,7 @@ def basic_protected():
 
 @app.route("/login", methods=["POST"])
 def login():
-    data = request.get_json()
+    data = request.get_json(silent=True)
 
     if not data:
         return jsonify({"error": "Invalid JSON"}), 400
@@ -62,7 +89,10 @@ def login():
     if not user or not check_password_hash(user["password"], password):
         return jsonify({"error": "Invalid credentials"}), 401
 
-    access_token = create_access_token(identity=username)
+    access_token = create_access_token(identity={
+        "username": username,
+        "role": user["role"],
+    })
 
     return jsonify({"access_token": access_token})
 
@@ -76,10 +106,9 @@ def jwt_protected():
 @app.route("/admin-only")
 @jwt_required()
 def admin_only():
-    username = get_jwt_identity()
-    user = users.get(username)
+    current_user = get_jwt_identity()
 
-    if not user or user.get("role") != "admin":
+    if current_user.get("role") != "admin":
         return jsonify({"error": "Admin access required"}), 403
 
     return "Admin Access: Granted"
