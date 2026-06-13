@@ -5,7 +5,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 class ApiHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/":
-            self.send_text_response("Hello, this is a simple API!")
+            self.send_text_response("hello world!")
 
         elif self.path == "/data":
             self.send_json_response({
@@ -18,6 +18,11 @@ class ApiHandler(BaseHTTPRequestHandler):
             self.send_json_response({
                 "version": "1.0",
                 "description": "A simple API built with http.server",
+            })
+
+        elif self.path == "/status":
+            self.send_json_response({
+                "status": "OK",
             })
 
         else:
