@@ -15,9 +15,9 @@ if __name__ == "__main__":
         db=sys.argv[3],
     )
 
-    cursor = conn.cursor()
+    cur = conn.cursor()
 
-    cursor.execute(
+    cur.execute(
         "SELECT id, name "
         "FROM states "
         "WHERE name "
@@ -25,9 +25,9 @@ if __name__ == "__main__":
         "ORDER BY id ASC"
     )
 
-    rows = cursor.fetchall()
+    rows = cur.fetchall()
     for row in rows:
         print(row)
 
-    cursor.close()
+    cur.close()
     conn.close()
