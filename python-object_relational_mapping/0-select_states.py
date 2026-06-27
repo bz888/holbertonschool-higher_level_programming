@@ -1,25 +1,26 @@
 #!/usr/bin/python3
-"""List all states from a MySQL database using SQLAlchemy."""
+"""
+List all states in db
+"""
 
+import MySQLdb
 import sys
 
-from sqlalchemy import MetaData, Table, create_engine, select
-
-
 if __name__ == "__main__":
-    username = sys.argv[1]
-    password = sys.argv[2]
-    database = sys.argv[3]
-
-    engine = create_engine(
-        f"mysql+mysqldb://{username}:{password}@localhost:3306/{database}",
-        pool_pre_ping=True,
+    db = MySQLdb.connect(
+        host="localhost",
+        port=3306,
+        user=sys.argv[1],
+        passwd=sys.argv[2],
+        db=sys.argv[3],
+        charset="utf8",
     )
 
-    metadata = MetaData()
-    states = Table("states", metadata, autoload_with=engine)
-    stmt = select(states).order_by(states.c.id)
+    cursor = db.cursor()
+    cursor.execute("SELECT id, name FROM states ORDER BY id ASC")
+    rows = cursor.fetchall()
+    for row in rows:
+        print(row)
 
-    with engine.connect() as connection:
-        for row in connection.execute(stmt):
-            print(tuple(row))
+    cursor.close()
+    db.close()
