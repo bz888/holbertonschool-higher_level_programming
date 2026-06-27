@@ -1,9 +1,9 @@
 #!/usr/bin/python3
-"""List all states from a MySQL database."""
+"""List all states from a MySQL database using SQLAlchemy."""
 
 import sys
 
-import MySQLdb
+from sqlalchemy import MetaData, Table, create_engine, select
 
 
 if __name__ == "__main__":
@@ -11,19 +11,15 @@ if __name__ == "__main__":
     password = sys.argv[2]
     database = sys.argv[3]
 
-    db = MySQLdb.connect(
-        host="localhost",
-        port=3306,
-        user=username,
-        passwd=password,
-        db=database,
+    engine = create_engine(
+        f"mysql+mysqldb://{username}:{password}@localhost:3306/{database}",
+        pool_pre_ping=True,
     )
 
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM states ORDER BY states.id ASC")
+    metadata = MetaData()
+    states = Table("states", metadata, autoload_with=engine)
+    stmt = select(states).order_by(states.c.id)
 
-    for row in cursor.fetchall():
-        print(row)
-
-    cursor.close()
-    db.close()
+    with engine.connect() as connection:
+        for row in connection.execute(stmt):
+            print(tuple(row))
